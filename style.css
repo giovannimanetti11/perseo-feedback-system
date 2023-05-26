@@ -1,0 +1,32 @@
+#perseo-feedback-widget {
+    position: fixed;
+    top: -100px; 
+    width: 100%;
+    background-color: #0073aa;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: top 2s ease-in-out, opacity 2s ease-in-out;
+}
+
+#perseo-feedback-widget.show {
+    top: 0;
+    opacity: 1;
+}
+
+#perseo-feedback-widget button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    color: #0073aa;
+    background-color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}

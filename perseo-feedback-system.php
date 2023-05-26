@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Perseo Feedback System
-Plugin URI: https://your-website.com/
+Plugin URI: https://github.com/giovannimanetti11/perseo-feedback-system
 Description: An open-source feedback system for your WordPress site.
 Version: 0.1
 Author: Giovanni Manetti
@@ -23,7 +23,7 @@ class Perseo_Feedback_Widget extends WP_Widget {
     public function widget( $args, $instance ) {
         // Widget output
         echo '<div id="perseo-feedback-widget">';
-        echo 'Did you find this page useful? <button>YES</button> <button>NO</button>';
+        echo 'Did you find this page useful? <button id="perseo-feedback-yes">YES</button> <button id="perseo-feedback-no">NO</button>';
         echo '</div>';
     }
 
@@ -43,13 +43,33 @@ function register_perseo_feedback_widget() {
 add_action( 'widgets_init', 'register_perseo_feedback_widget' );
 
 
+// Register REST API route
+
+function perseo_register_rest_route() {
+    register_rest_route('perseo/v1', '/feedback', array(
+        'methods' => 'POST',
+        'callback' => 'perseo_save_feedback',
+        'permission_callback' => '__return_true'
+    ));
+}
+add_action('rest_api_init', 'perseo_register_rest_route');
+
+
+// Register scripts and styles
+function perseo_enqueue_scripts() {
+    wp_enqueue_script('perseo-feedback-script', plugin_dir_url(__FILE__) . 'feedback.js', array(), '0.1', true);
+    wp_enqueue_style('perseo-feedback-style', plugin_dir_url(__FILE__) . 'style.css', array(), '0.1');
+}
+add_action('wp_enqueue_scripts', 'perseo_enqueue_scripts');
+
+
 
 register_activation_hook(__FILE__, 'perseo_feedback_install');
 
 function perseo_feedback_install() {
     global $wpdb;
 
-    require_once('db_config.php');
+    require_once('db-config.php');
 
     $table_name = $wpdb->prefix . 'perseo_feedback';
 
@@ -63,6 +83,7 @@ function perseo_feedback_install() {
         feedback varchar(1) DEFAULT '' NOT NULL,
         ip varchar(45) DEFAULT '' NOT NULL,
         device varchar(20) DEFAULT '' NOT NULL,
+        user_agent varchar(255) DEFAULT '' NOT NULL,
         PRIMARY KEY  (id)
     ) $charset_collate;";
 
@@ -73,10 +94,11 @@ function perseo_feedback_install() {
 }
 
 
+
 function perseo_save_feedback() {
     global $wpdb;
 
-    require_once('db_config.php');
+    require_once('db-config.php');
 
     $table_name = $wpdb->prefix . 'perseo_feedback';
 
@@ -84,6 +106,7 @@ function perseo_save_feedback() {
     $feedback = $_POST['feedback'];
     $ip = $_SERVER['REMOTE_ADDR'];
     $device = wp_is_mobile() ? 'mobile' : 'desktop';
+    $user_agent = $_SERVER['HTTP_USER_AGENT'];
 
     // Insert feedback data into the database
     $wpdb->insert(
@@ -93,12 +116,14 @@ function perseo_save_feedback() {
             'url' => $url,
             'feedback' => $feedback,
             'ip' => $ip,
-            'device' => $device
+            'device' => $device,
+            'user_agent' => $user_agent
         )
     );
 
     wp_die();
 }
+
 
 // Register the AJAX action for saving feedback
 add_action('wp_ajax_perseo_save_feedback', 'perseo_save_feedback');
