@@ -13,6 +13,24 @@ The feedback prompt appears 5 seconds after the page has loaded, providing a non
 3. Activate the plugin through the 'Plugins' menu in WordPress.
 4. The feedback prompt will now appear on your site.
 
+## Configuration
+
+Before using the Perseo Feedback System, you need to create a `db-config.php` file in the root directory of the plugin. This file should contain the necessary database connection information. You can use the following template:
+
+```php
+<?php
+
+define('DB_HOST', 'your_database_host');
+define('DB_NAME', 'your_database_name');
+define('DB_USER', 'your_database_user');
+define('DB_PASSWORD', 'your_database_password');
+
+?>
+
+```
+
+Make sure to replace your_database_host, your_database_name, your_database_user, and your_database_password with the appropriate values for your WordPress database.
+
 ## Usage
 
 The Perseo Feedback System works automatically once activated. All feedback responses from users are stored in a new database table called 'perseo_feedback'.
