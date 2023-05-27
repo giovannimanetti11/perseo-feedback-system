@@ -73,8 +73,33 @@ function perseo_feedback_install() {
     dbDelta($sql);
 }
 
+function perseo_getallheaders() {
+    $headers = [];
+    foreach ($_SERVER as $name => $value) {
+        if (substr($name, 0, 5) == 'HTTP_') {
+            $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+        }
+    }
+    return $headers;
+}
+
 
 function perseo_save_feedback() {
+    // Get the nonce from the headers
+    $headers = perseo_getallheaders();
+    if (!isset($headers['X-Wp-Nonce'])) {
+        wp_send_json_error('Nonce not provided', 403);
+        exit;
+    }
+
+    // Verify the nonce
+    $nonce = $headers['X-Wp-Nonce'];
+
+    if (!wp_verify_nonce($nonce, 'wp_rest')) {
+        wp_send_json_error('Invalid nonce', 403);
+        exit;
+    }
+
     global $wpdb;
 
     // Get the raw POST data
@@ -117,4 +142,6 @@ function perseo_save_feedback() {
 // Register the AJAX action for saving feedback
 add_action('wp_ajax_perseo_save_feedback', 'perseo_save_feedback');
 add_action('wp_ajax_nopriv_perseo_save_feedback', 'perseo_save_feedback');
+
+
 
