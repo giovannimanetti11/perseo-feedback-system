@@ -1,20 +1,34 @@
 #perseo-feedback-widget {
     position: fixed;
-    top: -100px; 
     width: 100%;
     background-color: #0A2944;
     color: #fff;
     padding: 15px;
     text-align: center;
     z-index: 9999;
-    opacity: 0;
-    transition: top 2s ease-in-out, opacity 2s ease-in-out;
+    transition: top 2s ease-in-out, bottom 2s ease-in-out, opacity 2s ease-in-out;
 }
 
-#perseo-feedback-widget.show {
-    top: 0;
-    opacity: 1;
+#perseo-feedback-widget.top {
+    top: -100px;
+    transition: top 2s ease-in-out;
 }
+
+#perseo-feedback-widget.bottom {
+    bottom: -100px;
+    transition: bottom 2s ease-in-out;
+}
+
+#perseo-feedback-widget.top.show {
+    top: 0;
+    animation: slideInDown 2s 0.5s linear;
+}
+
+#perseo-feedback-widget.bottom.show {
+    bottom: 0;
+    animation: slideInUp 2s 0.5s linear;
+}
+
 
 #perseo-feedback-widget button {
     margin-left: 10px;
@@ -32,18 +46,16 @@
     border: 1px solid #3E92A2;
 }
 
-@keyframes fadeIn {
+@keyframes slideInUp {
     from {
-        opacity: 0;
-        transform: scale(0.8);
+        bottom: -100px;
     }
     to {
-        opacity: 1;
-        transform: scale(1);
+        bottom: 0;
     }
 }
 
-@keyframes slideInUp {
+@keyframes slideInDown {
     from {
         top: -100px;
     }
@@ -52,14 +64,10 @@
     }
 }
 
-#perseo-feedback-widget.show {
-    animation: fadeIn 2s 0.5s linear, slideInUp 2s 0.5s linear;
-}
-
 @media only screen and (max-width: 600px) {
     #perseo-feedback-widget span {
         width: 100%;
         display: block;
         margin-bottom: 25px;
     }
-  }
+}

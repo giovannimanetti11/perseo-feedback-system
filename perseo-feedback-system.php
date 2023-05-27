@@ -12,10 +12,12 @@ License URI: https://opensource.org/licenses/MIT
 
 // Print feedback HTML
 function perseo_feedback_html() {
-    echo '<div id="perseo-feedback-widget">';
-    echo '<span>Hai trovato utile questa pagina?</span> <button id="perseo-feedback-yes">SI</button> <button id="perseo-feedback-no">NO</button>';
+    $options = get_option('perseo_options');
+    echo '<div id="perseo-feedback-widget" class="' . esc_attr($options['position']) . '">';
+    echo '<span>' . esc_html($options['text']) . '</span> <button id="perseo-feedback-yes">' . esc_html($options['yes']) . '</button> <button id="perseo-feedback-no">' . esc_html($options['no']) . '</button>';
     echo '</div>';
 }
+
 add_action('wp_footer', 'perseo_feedback_html');
 
 
@@ -143,5 +145,130 @@ function perseo_save_feedback() {
 add_action('wp_ajax_perseo_save_feedback', 'perseo_save_feedback');
 add_action('wp_ajax_nopriv_perseo_save_feedback', 'perseo_save_feedback');
 
+
+
+function perseo_feedback_menu() {
+    // Add the top-level admin menu
+    $page_title = 'Perseo Feedback';
+    $menu_title = 'Perseo Feedback';
+    $capability = 'manage_options';
+    $menu_slug = 'perseo-feedback-settings';
+    $function = 'perseo_feedback_settings_page';
+    $icon_url = 'dashicons-chart-bar';  // Use a dashicon for bar charts
+    $position = 100;  // Position in menu. Higher number is lower.
+    add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
+
+    // Add submenu page with same slug as parent to ensure no duplicates
+    $sub_menu_title = 'Settings';
+    add_submenu_page($menu_slug, $page_title, $sub_menu_title, $capability, $menu_slug, $function);
+
+    // Now add the submenu page for Statistics
+    $submenu_page_title = 'Perseo Feedback Statistics';
+    $submenu_title = 'Statistics';
+    $submenu_slug = 'perseo-feedback-statistics';
+    $submenu_function = 'perseo_feedback_statistics_page';
+    add_submenu_page($menu_slug, $submenu_page_title, $submenu_title, $capability, $submenu_slug, $submenu_function);
+}
+add_action('admin_menu', 'perseo_feedback_menu');
+
+// Display the settings page content
+function perseo_feedback_settings_page() {
+    ?>
+    <div class="wrap">
+        <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+        <form action="options.php" method="post">
+            <?php
+            settings_fields('perseo');
+            do_settings_sections('perseo');
+            submit_button('Save Settings');
+            ?>
+        </form>
+    </div>
+    <?php
+}
+
+
+function perseo_feedback_settings_init() {
+    register_setting('perseo', 'perseo_options');
+    
+    add_settings_section(
+        'perseo_settings_section',
+        'Perseo Feedback Settings',
+        null,
+        'perseo'
+    );
+
+    add_settings_field(
+        'perseo_settings_field_position',
+        'Feedback Position',
+        'perseo_feedback_settings_field_position_cb',
+        'perseo',
+        'perseo_settings_section'
+    );
+
+    add_settings_field(
+        'perseo_settings_field_text',
+        'Feedback Text',
+        'perseo_feedback_settings_field_text_cb',
+        'perseo',
+        'perseo_settings_section'
+    );
+
+    add_settings_field(
+        'perseo_settings_field_yes',
+        'Yes Button Text',
+        'perseo_feedback_settings_field_yes_cb',
+        'perseo',
+        'perseo_settings_section'
+    );
+
+    add_settings_field(
+        'perseo_settings_field_no',
+        'No Button Text',
+        'perseo_feedback_settings_field_no_cb',
+        'perseo',
+        'perseo_settings_section'
+    );
+}
+add_action('admin_init', 'perseo_feedback_settings_init');
+
+function perseo_feedback_settings_field_position_cb() {
+    $options = get_option('perseo_options');
+    ?>
+    <select id="perseo_settings_field_position" name="perseo_options[position]">
+        <option value="top" <?php selected($options['position'], 'top'); ?>>Top</option>
+        <option value="bottom" <?php selected($options['position'], 'bottom'); ?>>Bottom</option>
+    </select>
+    <?php
+}
+
+function perseo_feedback_settings_field_text_cb() {
+    $options = get_option('perseo_options');
+    ?>
+    <input type="text" id="perseo_settings_field_text" name="perseo_options[text]" value="<?php echo esc_attr($options['text']); ?>" />
+    <?php
+}
+
+function perseo_feedback_settings_field_yes_cb() {
+    $options = get_option('perseo_options');
+    ?>
+    <input type="text" id="perseo_settings_field_yes" name="perseo_options[yes]" value="<?php echo esc_attr($options['yes']); ?>" />
+    <?php
+}
+
+function perseo_feedback_settings_field_no_cb() {
+    $options = get_option('perseo_options');
+    ?>
+    <input type="text" id="perseo_settings_field_no" name="perseo_options[no]" value="<?php echo esc_attr($options['no']); ?>" />
+    <?php
+}
+
+
+
+// Display the statistics page content
+function perseo_feedback_statistics_page() {
+    echo '<h1>Perseo Feedback Statistics</h1>';
+    // Add statistics fields and options here...
+}
 
 
