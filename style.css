@@ -21,9 +21,15 @@
     padding: 5px 10px;
     color: #0A2944;
     background-color: #fff;
-    border: none;
     border-radius: 3px;
     cursor: pointer;
+    width: 75px;
+    border: 1px solid #fff;
+}
+
+#perseo-feedback-widget button:hover {
+    color: #3E92A2;
+    border: 1px solid #3E92A2;
 }
 
 @keyframes fadeIn {
@@ -49,3 +55,11 @@
 #perseo-feedback-widget.show {
     animation: fadeIn 2s 0.5s linear, slideInUp 2s 0.5s linear;
 }
+
+@media only screen and (max-width: 600px) {
+    #perseo-feedback-widget span {
+        width: 100%;
+        display: block;
+        margin-bottom: 25px;
+    }
+  }

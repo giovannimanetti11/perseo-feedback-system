@@ -13,7 +13,7 @@ License URI: https://opensource.org/licenses/MIT
 // Print feedback HTML
 function perseo_feedback_html() {
     echo '<div id="perseo-feedback-widget">';
-    echo 'Hai trovato utile questa pagina? <button id="perseo-feedback-yes">SI</button> <button id="perseo-feedback-no">NO</button>';
+    echo '<span>Hai trovato utile questa pagina?</span> <button id="perseo-feedback-yes">SI</button> <button id="perseo-feedback-no">NO</button>';
     echo '</div>';
 }
 add_action('wp_footer', 'perseo_feedback_html');
@@ -119,8 +119,6 @@ function perseo_save_feedback() {
         wp_send_json_success("Feedback recorded successfully", 200);
     }
 }
-
-
 
 // Register the AJAX action for saving feedback
 add_action('wp_ajax_perseo_save_feedback', 'perseo_save_feedback');
