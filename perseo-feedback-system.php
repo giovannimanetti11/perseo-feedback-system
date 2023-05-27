@@ -52,8 +52,6 @@ register_activation_hook(__FILE__, 'perseo_feedback_install');
 function perseo_feedback_install() {
     global $wpdb;
 
-    require_once('db-config.php');
-
     $table_name = $wpdb->prefix . 'perseo_feedback';
 
     $charset_collate = $wpdb->get_charset_collate();
@@ -81,8 +79,6 @@ function perseo_feedback_install() {
 
 function perseo_save_feedback() {
     global $wpdb;
-
-    require_once('db-config.php');
 
     // Get the raw POST data
     $raw_data = file_get_contents('php://input');
