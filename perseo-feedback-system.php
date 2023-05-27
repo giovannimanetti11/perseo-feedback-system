@@ -45,7 +45,6 @@ function perseo_enqueue_scripts() {
 add_action('wp_enqueue_scripts', 'perseo_enqueue_scripts');
 
 
-
 // On plugin activation, create feedback table
 register_activation_hook(__FILE__, 'perseo_feedback_install');
 
@@ -68,13 +67,11 @@ function perseo_feedback_install() {
         PRIMARY KEY  (id)
     ) $charset_collate;";
 
-
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
     // Execute the SQL query to create the table
     dbDelta($sql);
 }
-
 
 
 function perseo_save_feedback() {
@@ -86,8 +83,9 @@ function perseo_save_feedback() {
     // Decode the JSON data into an array
     $data = json_decode($raw_data, true);
 
-    $url = $data['url'];
-    $feedback = $data['feedback'];
+    // Sanitize the data
+    $url = sanitize_text_field($data['url']);
+    $feedback = sanitize_text_field($data['feedback']);
     $ip = $_SERVER['REMOTE_ADDR'];
     $device = wp_is_mobile() ? 'mobile' : 'desktop';
     $user_agent = $_SERVER['HTTP_USER_AGENT'];
