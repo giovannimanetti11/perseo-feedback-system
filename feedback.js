@@ -17,15 +17,30 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function sendFeedback(feedback) {
-        wp.apiFetch({
-            path: '/wp-json/perseo/v1/feedback',
+        var data = {
+            url: window.location.href,
+            feedback: feedback
+        };
+    
+        //console.log('Sending feedback:', data);
+    
+        fetch('/wp-json/perseo/v1/feedback', {
             method: 'POST',
-            data: {
-                url: window.location.href,
-                feedback: feedback
-            }
-        }).then(function() {
+            headers: {
+                'X-WP-Nonce': wpApiSettings.nonce,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(response => response.json())
+          .then(data => {
+            //console.log('Success:', data);
             widget.style.display = 'none';
-        });
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
     }
+    
+    
+    
 });

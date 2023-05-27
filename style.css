@@ -2,7 +2,7 @@
     position: fixed;
     top: -100px; 
     width: 100%;
-    background-color: #0073aa;
+    background-color: #0A2944;
     color: #fff;
     padding: 15px;
     text-align: center;
@@ -19,7 +19,7 @@
 #perseo-feedback-widget button {
     margin-left: 10px;
     padding: 5px 10px;
-    color: #0073aa;
+    color: #0A2944;
     background-color: #fff;
     border: none;
     border-radius: 3px;
@@ -27,6 +27,25 @@
 }
 
 @keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        top: -100px;
+    }
+    to {
+        top: 0;
+    }
+}
+
+#perseo-feedback-widget.show {
+    animation: fadeIn 2s 0.5s linear, slideInUp 2s 0.5s linear;
 }
