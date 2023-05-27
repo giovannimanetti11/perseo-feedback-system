@@ -2,7 +2,8 @@
 
 ## Description
 
-The Perseo Feedback System is an open-source plugin for WordPress sites. It adds a feedback prompt to your pages, asking users the question "Hai trovato utile questa pagina?" ("Did you find this page useful?") with "Yes" and "No" options. This feedback is then saved to the WordPress database for later analysis.
+The Perseo Feedback System is an open-source plugin for WordPress sites. It adds a feedback prompt to your pages, asking users a question of your choice with two simple buttons. 
+You can set the options within the "Perseo Feedback" settings menu that appears after plugin activation.
 
 The feedback prompt appears 5 seconds after the page has loaded, providing a non-intrusive way of gathering user feedback.
 
