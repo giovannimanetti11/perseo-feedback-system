@@ -110,6 +110,17 @@ function perseo_save_feedback() {
     // Decode the JSON data into an array
     $data = json_decode($raw_data, true);
 
+    // Validate the data
+    if (!isset($data['url']) || !isset($data['feedback'])) {
+        wp_send_json_error('Missing data', 400);
+        exit;
+    }
+
+    if (!filter_var($data['url'], FILTER_VALIDATE_URL) || !in_array($data['feedback'], ['yes', 'no'])) {
+        wp_send_json_error('Invalid data', 400);
+        exit;
+    }
+
     // Sanitize the data
     $url = sanitize_text_field($data['url']);
     $feedback = sanitize_text_field($data['feedback']);
@@ -140,6 +151,29 @@ function perseo_save_feedback() {
         wp_send_json_success("Feedback recorded successfully", 200);
     }
 }
+
+function perseo_validate_options($input) {
+    // All our options are text fields, so sanitize them
+    $input['position'] = sanitize_text_field($input['position']);
+    $input['text'] = sanitize_text_field($input['text']);
+    $input['yes'] = sanitize_text_field($input['yes']);
+    $input['no'] = sanitize_text_field($input['no']);
+
+    // Validate position option
+    if (!in_array($input['position'], ['top', 'bottom'])) {
+        add_settings_error(
+            'perseo_options', // Setting title
+            'perseo_text_error', // Error ID
+            'Please select a valid position.', // Error message
+            'error' // Type of message
+        );
+    }
+
+    return $input;
+}
+
+register_setting('perseo', 'perseo_options', 'perseo_validate_options');
+
 
 // Register the AJAX action for saving feedback
 add_action('wp_ajax_perseo_save_feedback', 'perseo_save_feedback');
