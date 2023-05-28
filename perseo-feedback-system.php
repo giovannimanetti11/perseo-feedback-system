@@ -15,8 +15,10 @@ function perseo_feedback_html() {
     $options = get_option('perseo_options');
     echo '<div id="perseo-feedback-widget" class="' . esc_attr($options['position']) . '">';
     echo '<span>' . esc_html($options['text']) . '</span> <button id="perseo-feedback-yes">' . esc_html($options['yes']) . '</button> <button id="perseo-feedback-no">' . esc_html($options['no']) . '</button>';
+    echo '<div id="perseo-feedback-close">chiudi X</div>';
     echo '</div>';
 }
+
 
 add_action('wp_footer', 'perseo_feedback_html');
 

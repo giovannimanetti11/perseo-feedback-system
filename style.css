@@ -1,5 +1,8 @@
 #perseo-feedback-widget {
     position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     background-color: #0A2944;
     color: #fff;
@@ -44,6 +47,18 @@
 #perseo-feedback-widget button:hover {
     color: #3E92A2;
     border: 1px solid #3E92A2;
+}
+
+#perseo-feedback-close {
+    color: #fff;
+    float: right;
+    font-size: 16px;
+    line-height: 20px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 25px;
 }
 
 @keyframes slideInUp {
