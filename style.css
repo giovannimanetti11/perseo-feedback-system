@@ -61,6 +61,24 @@
     font-size: 25px;
 }
 
+#piechart_feedback,
+#piechart_device,
+#table_browsers {
+    width: 100%;
+    height: 500px;
+    margin-bottom: 30px;
+}
+
+.google-visualization-table-table {
+    width: 100%;
+    font-size: 16px;
+}
+
+.google-visualization-table-th {
+    background-color: #f1f1f1;
+}
+
+
 @keyframes slideInUp {
     from {
         bottom: -100px;

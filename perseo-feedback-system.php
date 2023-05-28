@@ -199,8 +199,8 @@ function perseo_feedback_menu() {
     add_submenu_page($menu_slug, $page_title, $sub_menu_title, $capability, $menu_slug, $function);
 
     // Now add the submenu page for Statistics
-    $submenu_page_title = 'Perseo Feedback Statistics (Coming soon)';
-    $submenu_title = 'Statistics (Coming soon)';
+    $submenu_page_title = 'Perseo Feedback Statistics (Beta)';
+    $submenu_title = 'Statistics (Beta)';
     $submenu_slug = 'perseo-feedback-statistics';
     $submenu_function = 'perseo_feedback_statistics_page';
     add_submenu_page($menu_slug, $submenu_page_title, $submenu_title, $capability, $submenu_slug, $submenu_function);
@@ -301,14 +301,62 @@ function perseo_feedback_settings_field_no_cb() {
 }
 
 
-
-// Display the statistics page content
 function perseo_feedback_statistics_page() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'perseo_feedback';
+
+    // Get Yes and No feedback counts
+    $yes_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE feedback = 'yes'");
+    $no_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE feedback = 'no'");
+
+    // Get desktop and mobile counts
+    $desktop_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE device = 'desktop'");
+    $mobile_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE device = 'mobile'");
+
+    // Include Google Charts
+    echo '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>';
     ?>
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+
+        <div id="piechart_feedback"></div>
+        <div id="piechart_device"></div>
+
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['corechart', 'table']});
+            google.charts.setOnLoadCallback(drawCharts);
+
+            function drawCharts() {
+                // Draw Yes/No feedback pie chart
+                var data1 = google.visualization.arrayToDataTable([
+                    ['Feedback', 'Count'],
+                    ['Yes', <?php echo $yes_count; ?>],
+                    ['No', <?php echo $no_count; ?>]
+                ]);
+                var options1 = {
+                    title: 'Feedback Yes/No'
+                };
+                var chart1 = new google.visualization.PieChart(document.getElementById('piechart_feedback'));
+                chart1.draw(data1, options1);
+
+                // Draw Desktop/Mobile pie chart
+                var data2 = google.visualization.arrayToDataTable([
+                    ['Device', 'Count'],
+                    ['Desktop', <?php echo $desktop_count; ?>],
+                    ['Mobile', <?php echo $mobile_count; ?>]
+                ]);
+                var options2 = {
+                    title: 'Desktop vs Mobile'
+                };
+                var chart2 = new google.visualization.PieChart(document.getElementById('piechart_device'));
+                chart2.draw(data2, options2);
+
+            }
+        </script>
     </div>
     <?php
 }
+
+
 
 
