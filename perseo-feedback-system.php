@@ -3,7 +3,7 @@
 Plugin Name: Perseo Feedback System
 Plugin URI: https://github.com/giovannimanetti11/perseo-feedback-system
 Description: An open-source feedback system for your WordPress site.
-Version: 0.1
+Version: 1.0
 Author: Giovanni Manetti
 Author URI: https://github.com/giovannimanetti11
 License: MIT License
@@ -199,8 +199,8 @@ function perseo_feedback_menu() {
     add_submenu_page($menu_slug, $page_title, $sub_menu_title, $capability, $menu_slug, $function);
 
     // Now add the submenu page for Statistics
-    $submenu_page_title = 'Perseo Feedback Statistics';
-    $submenu_title = 'Statistics (coming soon)';
+    $submenu_page_title = 'Perseo Feedback Statistics (Coming soon)';
+    $submenu_title = 'Statistics (Coming soon)';
     $submenu_slug = 'perseo-feedback-statistics';
     $submenu_function = 'perseo_feedback_statistics_page';
     add_submenu_page($menu_slug, $submenu_page_title, $submenu_title, $capability, $submenu_slug, $submenu_function);
@@ -304,8 +304,11 @@ function perseo_feedback_settings_field_no_cb() {
 
 // Display the statistics page content
 function perseo_feedback_statistics_page() {
-    echo '<h1>Perseo Feedback Statistics</h1>';
-    // Add statistics fields and options here...
+    ?>
+    <div class="wrap">
+        <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+    </div>
+    <?php
 }
 
 
