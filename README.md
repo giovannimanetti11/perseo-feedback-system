@@ -22,6 +22,10 @@ The Perseo Feedback System works automatically once activated. All feedback resp
 
 This plugin is open for enhancements and bug fixing. You are welcome to contribute to its development.
 
+## Privacy Policy
+
+Perseo Feedback System stores feedback responses from users in The WordPress database in a table called 'perseo_feedback'. The stored data includes the user's response to the feedback prompt, the timestamp of the response, the url the feedback was given, the ip address and user agent. This data is is not shared with any third parties.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
