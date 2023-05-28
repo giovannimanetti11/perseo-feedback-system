@@ -50,15 +50,15 @@
 }
 
 #perseo-feedback-close {
-    color: #fff;
-    float: right;
-    font-size: 16px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
     line-height: 20px;
     cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-    margin-left: 25px;
+}
+
+#perseo-feedback-close i {
+    font-size: 25px;
 }
 
 @keyframes slideInUp {

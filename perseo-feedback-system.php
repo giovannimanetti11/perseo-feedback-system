@@ -15,7 +15,7 @@ function perseo_feedback_html() {
     $options = get_option('perseo_options');
     echo '<div id="perseo-feedback-widget" class="' . esc_attr($options['position']) . '">';
     echo '<span>' . esc_html($options['text']) . '</span> <button id="perseo-feedback-yes">' . esc_html($options['yes']) . '</button> <button id="perseo-feedback-no">' . esc_html($options['no']) . '</button>';
-    echo '<div id="perseo-feedback-close">chiudi X</div>';
+    echo '<div id="perseo-feedback-close"><i class="fa fa-times-circle" aria-hidden="true"></i></div>';
     echo '</div>';
 }
 
@@ -200,7 +200,7 @@ function perseo_feedback_menu() {
 
     // Now add the submenu page for Statistics
     $submenu_page_title = 'Perseo Feedback Statistics';
-    $submenu_title = 'Statistics';
+    $submenu_title = 'Statistics (coming soon)';
     $submenu_slug = 'perseo-feedback-statistics';
     $submenu_function = 'perseo_feedback_statistics_page';
     add_submenu_page($menu_slug, $submenu_page_title, $submenu_title, $capability, $submenu_slug, $submenu_function);
@@ -281,9 +281,10 @@ function perseo_feedback_settings_field_position_cb() {
 function perseo_feedback_settings_field_text_cb() {
     $options = get_option('perseo_options');
     ?>
-    <input type="text" id="perseo_settings_field_text" name="perseo_options[text]" value="<?php echo esc_attr($options['text']); ?>" />
+    <textarea id="perseo_settings_field_text" name="perseo_options[text]" rows="5" cols="30"><?php echo esc_textarea($options['text']); ?></textarea>
     <?php
 }
+
 
 function perseo_feedback_settings_field_yes_cb() {
     $options = get_option('perseo_options');
