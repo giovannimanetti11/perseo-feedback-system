@@ -17,6 +17,7 @@ The feedback prompt appears 5 seconds after the page has loaded, providing a non
 ## Usage
 
 The Perseo Feedback System works automatically once activated. All feedback responses from users are stored in a new database table called 'perseo_feedback'.
+Statistics are displayed in the related plugin's menu within WordPress.
 
 ## Development
 
