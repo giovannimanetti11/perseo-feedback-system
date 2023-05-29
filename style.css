@@ -62,20 +62,39 @@
 }
 
 #piechart_feedback,
-#piechart_device,
-#table_browsers {
+#piechart_device {
     width: 100%;
     height: 500px;
     margin-bottom: 30px;
 }
 
-.google-visualization-table-table {
-    width: 100%;
-    font-size: 16px;
+#piechart_feedback {
+    margin-right: 10px;
 }
 
-.google-visualization-table-th {
-    background-color: #f1f1f1;
+#piechart_device {
+    margin-left: 10px;
+}
+
+#tables, #charts {
+    display: flex;
+    flex-direction: row;
+}
+
+#table-best, #table-worst {
+    width: 100%;
+}
+
+.responsive-table {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.responsive-table th,
+.responsive-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ccc;
 }
 
 
@@ -120,5 +139,9 @@
 
     #perseo-feedback-widget.top {
         top: -200px;
+    }
+
+    #tables, #charts {
+        flex-direction: column;
     }
 }

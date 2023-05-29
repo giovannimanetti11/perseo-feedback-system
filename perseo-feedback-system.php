@@ -48,6 +48,13 @@ function perseo_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'perseo_enqueue_scripts');
 
+function perseo_enqueue_admin_scripts() {
+    wp_enqueue_style('perseo-feedback-style', plugin_dir_url(__FILE__) . 'style.css', array(), '0.1');
+}
+
+add_action('admin_enqueue_scripts', 'perseo_enqueue_admin_scripts');
+
+
 
 // On plugin activation, create feedback table
 register_activation_hook(__FILE__, 'perseo_feedback_install');
@@ -313,14 +320,77 @@ function perseo_feedback_statistics_page() {
     $desktop_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE device = 'desktop'");
     $mobile_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE device = 'mobile'");
 
+    // Get top 5 pages with best feedback
+    $top_pages = $wpdb->get_results("
+    SELECT url, COUNT(*) as count
+    FROM $table_name
+    WHERE feedback = 'yes'
+    GROUP BY url
+    ORDER BY count DESC
+    LIMIT 5
+    ");
+
+    // Get top 5 pages with worst feedback
+    $worst_pages = $wpdb->get_results("
+    SELECT url, COUNT(*) as count
+    FROM $table_name
+    WHERE feedback = 'no'
+    GROUP BY url
+    ORDER BY count DESC
+    LIMIT 5
+    ");
+
     // Include Google Charts
     echo '<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>';
     ?>
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
-        <div id="piechart_feedback"></div>
-        <div id="piechart_device"></div>
+        <div id="charts">
+            <div id="piechart_feedback"></div>
+            <div id="piechart_device"></div>
+        </div>
+
+        <div id="tables">
+            <div id="table-best">
+                <h2>Top 5 Pages with Best Feedback</h2>
+                <table class="responsive-table">
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($top_pages as $page) : ?>
+                            <tr>
+                                <td><?php echo esc_html($page->url); ?></td>
+                                <td><?php echo esc_html($page->count); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <div id="table-worst">
+                <h2>Top 5 Pages with Worst Feedback</h2>
+                <table class="responsive-table">
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($worst_pages as $page) : ?>
+                            <tr>
+                                <td><?php echo esc_html($page->url); ?></td>
+                                <td><?php echo esc_html($page->count); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <script type="text/javascript">
             google.charts.load('current', {'packages':['corechart', 'table']});
