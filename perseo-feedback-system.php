@@ -353,7 +353,7 @@ function perseo_feedback_statistics_page() {
 
         <div id="tables">
             <div id="table-best">
-                <h2>Top 5 Pages with Best Feedback</h2>
+                <h2>Top 5 pages with good feedback</h2>
                 <table class="responsive-table">
                     <thead>
                         <tr>
@@ -372,7 +372,7 @@ function perseo_feedback_statistics_page() {
                 </table>
             </div>
             <div id="table-worst">
-                <h2>Top 5 Pages with Worst Feedback</h2>
+                <h2>Top 5 pages with bad feedback</h2>
                 <table class="responsive-table">
                     <thead>
                         <tr>

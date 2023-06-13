@@ -12,6 +12,10 @@
     transition: top 2s ease-in-out, bottom 2s ease-in-out, opacity 2s ease-in-out;
 }
 
+#perseo-feedback-widget span {
+    font-weight: bold;
+}
+
 #perseo-feedback-widget.top {
     top: -100px;
     transition: top 2s ease-in-out;
@@ -61,6 +65,10 @@
     font-size: 25px;
 }
 
+#perseo-feedback-close i:hover {
+    opacity: 0.8;
+}
+
 #piechart_feedback,
 #piechart_device {
     width: 100%;
@@ -69,11 +77,11 @@
 }
 
 #piechart_feedback {
-    margin-right: 10px;
+    margin-right: 5px;
 }
 
 #piechart_device {
-    margin-left: 10px;
+    margin-left: 5px;
 }
 
 #tables, #charts {
