@@ -96,6 +96,8 @@ function perseo_getallheaders() {
 
 
 function perseo_save_feedback() {
+    error_log('perseo_save_feedback was called');
+
     // Get the nonce from the headers
     $headers = perseo_getallheaders();
     if (!isset($headers['X-Wp-Nonce'])) {
@@ -112,6 +114,8 @@ function perseo_save_feedback() {
     }
 
     global $wpdb;
+
+    error_log(print_r($_POST, true));
 
     // Get the raw POST data
     $raw_data = file_get_contents('php://input');
@@ -153,12 +157,15 @@ function perseo_save_feedback() {
     );
 
     if ($result === false) {
-        // The insert failed. Return an error message with the last error occurred in $wpdb.
+        // The insert failed. Log the error and then return an error message with the last error occurred in $wpdb.
+        error_log('Failed to insert feedback into database: ' . $wpdb->last_error);
         wp_send_json_error($wpdb->last_error, 500);
     } else {
-        // If everything went well, send a 200 status code and a success message
+        // If everything went well, log a success message and then send a 200 status code and a success message
+        error_log('Successfully inserted feedback into database');
         wp_send_json_success("Feedback recorded successfully", 200);
     }
+    
 }
 
 function perseo_validate_options($input) {
@@ -308,9 +315,17 @@ function perseo_feedback_settings_field_no_cb() {
 }
 
 
+
+
 function perseo_feedback_statistics_page() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'perseo_feedback';
+
+    // Get total feedback count
+    $total_feedback_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+
+    // Get feedback count for the last 7 days
+    $last_7_days_feedback_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE time > NOW() - INTERVAL 7 DAY");
 
     // Get Yes and No feedback counts
     $yes_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE feedback = 'yes'");
@@ -320,6 +335,8 @@ function perseo_feedback_statistics_page() {
     $desktop_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE device = 'desktop'");
     $mobile_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE device = 'mobile'");
 
+
+
     // Get top 5 pages with best feedback
     $top_pages = $wpdb->get_results("
     SELECT url, COUNT(*) as count
@@ -327,7 +344,7 @@ function perseo_feedback_statistics_page() {
     WHERE feedback = 'yes'
     GROUP BY url
     ORDER BY count DESC
-    LIMIT 5
+    LIMIT 10
     ");
 
     // Get top 5 pages with worst feedback
@@ -337,7 +354,7 @@ function perseo_feedback_statistics_page() {
     WHERE feedback = 'no'
     GROUP BY url
     ORDER BY count DESC
-    LIMIT 5
+    LIMIT 10
     ");
 
     // Include Google Charts
@@ -350,10 +367,15 @@ function perseo_feedback_statistics_page() {
             <div id="piechart_feedback"></div>
             <div id="piechart_device"></div>
         </div>
-
+        <div class="statistics">
+            <?php
+            echo "<div><h2>Total feedbacks:</h2> " . $total_feedback_count . "</div>";
+            echo "<div><h2>Feedbacks in the last 7 days:</h2> " . $last_7_days_feedback_count . "</div>";
+            ?>
+        </div>
         <div id="tables">
             <div id="table-best">
-                <h2>Top 5 pages with good feedback</h2>
+                <h2>Top 10 pages with good feedback</h2>
                 <table class="responsive-table">
                     <thead>
                         <tr>
@@ -372,7 +394,7 @@ function perseo_feedback_statistics_page() {
                 </table>
             </div>
             <div id="table-worst">
-                <h2>Top 5 pages with bad feedback</h2>
+                <h2>Top 10 pages with bad feedback</h2>
                 <table class="responsive-table">
                     <thead>
                         <tr>

@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Document is ready');
+
     var widget = document.getElementById('perseo-feedback-widget');
     var yesButton = document.getElementById('perseo-feedback-yes');
     var noButton = document.getElementById('perseo-feedback-no');
@@ -33,9 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             url: window.location.href,
             feedback: feedback
         };
-    
-        //console.log('Sending feedback:', data);
-    
+
         fetch('/wp-json/perseo/v1/feedback', {
             method: 'POST',
             headers: {
@@ -43,20 +43,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
-        }).then(response => response.json())
-          .then(data => {
-            //console.log('Success:', data);
+        }).then(response => {
+            return response.json();
+        }).then(data => {
             document.cookie = "perseo_feedback_given=true; max-age=604800; path=/";
             hideWidget();
-          })
-          .catch((error) => {
+        }).catch((error) => {
             console.error('Error:', error);
-          });
+        });
     }
 
     function hideWidget() {
         widget.style.display = 'none';
     }
 });
-
-

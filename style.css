@@ -105,6 +105,21 @@
     border: 1px solid #ccc;
 }
 
+.statistics, .statistics div {
+    display: flex;
+    flex-direction: row;
+}
+
+.statistics div:last-child {
+    margin-left: 25px;
+}
+
+.statistics div h2 {
+    margin: 0;
+    margin-right: 5px;
+    padding: 0;
+}
+
 
 @keyframes slideInUp {
     from {
