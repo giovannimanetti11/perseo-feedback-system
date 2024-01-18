@@ -25,7 +25,7 @@ This plugin is open for enhancements and bug fixing. You are welcome to contribu
 
 ## Privacy
 
-Perseo Feedback System stores feedback responses from users in The WordPress database in a table called 'perseo_feedback'. The stored data includes the user's response to the feedback prompt, the timestamp of the response, the url the feedback was given, the ip address and user agent. This data is is not shared with any third parties.
+Perseo Feedback System stores feedback responses from users in The WordPress database in a table called 'perseo_feedback'. The stored data includes the user's response to the feedback prompt, the timestamp of the response, the url the feedback was given, the ip address and user agent. This data is not shared with any third parties.
 
 ## License
 
