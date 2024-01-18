@@ -2,7 +2,7 @@
 
 ## Description
 
-The Perseo Feedback System is an open-source plugin for WordPress sites. It adds a feedback prompt to your pages, asking users a question of your choice with two simple buttons. 
+The Perseo Feedback System is an open-source plugin for WordPress websites. It adds a feedback prompt to your pages, asking users a question of your choice with two simple buttons. After users have clicked the button, a textarea is shown to collect a comment which is saved in the database once the send button is clicked.
 You can set the options within the "Perseo Feedback" settings menu that appears after plugin activation.
 
 The feedback prompt appears 5 seconds after the page has loaded, providing a non-intrusive way of gathering user feedback.
@@ -25,7 +25,7 @@ This plugin is open for enhancements and bug fixing. You are welcome to contribu
 
 ## Privacy
 
-Perseo Feedback System stores feedback responses from users in The WordPress database in a table called 'perseo_feedback'. The stored data includes the user's response to the feedback prompt, the timestamp of the response, the url the feedback was given, the ip address and user agent. This data is not shared with any third parties.
+Perseo Feedback System stores feedback responses from users in the WordPress database in a table called 'perseo_feedback'. The stored data includes the user's response to the feedback prompt, the timestamp of the response, the URL where the feedback was given, the IP address, and user agent. This data is not shared with any third parties.
 
 ## License
 
@@ -34,4 +34,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Authors
 
 - Giovanni Manetti - [GitHub](https://github.com/giovannimanetti11)
-
