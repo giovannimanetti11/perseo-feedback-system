@@ -3,7 +3,7 @@
 Plugin Name: Perseo Feedback System
 Plugin URI: https://github.com/giovannimanetti11/perseo-feedback-system
 Description: An open-source feedback system for your WordPress site.
-Version: 1.0
+Version: 1.1
 Author: Giovanni Manetti
 Author URI: https://github.com/giovannimanetti11
 License: MIT License
@@ -14,7 +14,16 @@ License URI: https://opensource.org/licenses/MIT
 function perseo_feedback_html() {
     $options = get_option('perseo_options');
     echo '<div id="perseo-feedback-widget" class="' . esc_attr($options['position']) . '">';
-    echo '<span>' . esc_html($options['text']) . '</span> <button id="perseo-feedback-yes">' . esc_html($options['yes']) . '</button> <button id="perseo-feedback-no">' . esc_html($options['no']) . '</button>';
+    echo '<span>' . esc_html($options['text']) . '</span>';
+
+    echo '<div class="buttons-container">';
+    echo '<button id="perseo-feedback-yes">' . esc_html($options['yes']) . '</button>';
+    echo '<button id="perseo-feedback-no">' . esc_html($options['no']) . '</button>';
+    echo '</div>';
+
+    echo '<textarea id="perseo-feedback-comment" placeholder="Lascia un commento..." style="display: none;"></textarea>';
+    echo '<button id="perseo-feedback-submit" style="display: none;">Invia</button>';
+
     echo '<div id="perseo-feedback-close"><i class="fa fa-times-circle" aria-hidden="true"></i></div>';
     echo '</div>';
 }
@@ -39,12 +48,16 @@ function perseo_enqueue_scripts() {
     wp_enqueue_script('wp-api-fetch');
     wp_enqueue_script('perseo-feedback-script', plugin_dir_url(__FILE__) . 'feedback.js', array('wp-api-fetch'), '0.1', true);
     wp_enqueue_style('perseo-feedback-style', plugin_dir_url(__FILE__) . 'style.css', array(), '0.1');
+
+    $options = get_option('perseo_options');
     
     // Localize the script with new data
     $script_data_array = array(
         'nonce' => wp_create_nonce('wp_rest'),  // Nonce for REST API
+        'followupText' => $options['followup_text'],
+        'thankYouText' => $options['thank_you_text']
     );
-    wp_localize_script('perseo-feedback-script', 'wpApiSettings', $script_data_array);
+    wp_localize_script('perseo-feedback-script', 'perseoSettings', $script_data_array);
 }
 add_action('wp_enqueue_scripts', 'perseo_enqueue_scripts');
 
@@ -72,6 +85,7 @@ function perseo_feedback_install() {
         time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
         url varchar(255) DEFAULT '' NOT NULL,
         feedback varchar(3) DEFAULT '' NOT NULL,
+        comment text DEFAULT NULL,
         ip varchar(45) DEFAULT '' NOT NULL,
         device varchar(20) DEFAULT '' NOT NULL,
         user_agent varchar(255) DEFAULT '' NOT NULL,
@@ -143,6 +157,9 @@ function perseo_save_feedback() {
 
     $table_name = $wpdb->prefix . 'perseo_feedback';
 
+    $data = json_decode($raw_data, true);
+    $comment = isset($data['comment']) ? sanitize_textarea_field($data['comment']) : '';
+
     // Insert feedback data into the database
     $result = $wpdb->insert(
         $table_name,
@@ -150,6 +167,7 @@ function perseo_save_feedback() {
             'time' => current_time('mysql'),
             'url' => $url,
             'feedback' => $feedback,
+            'comment' => $comment,
             'ip' => $ip,
             'device' => $device,
             'user_agent' => $user_agent
@@ -165,6 +183,9 @@ function perseo_save_feedback() {
         error_log('Successfully inserted feedback into database');
         wp_send_json_success("Feedback recorded successfully", 200);
     }
+
+
+    
     
 }
 
@@ -265,6 +286,14 @@ function perseo_feedback_settings_init() {
     );
 
     add_settings_field(
+        'perseo_settings_field_followup_text',
+        'Follow-up Text',
+        'perseo_feedback_settings_field_followup_text_cb',
+        'perseo',
+        'perseo_settings_section'
+    );
+
+    add_settings_field(
         'perseo_settings_field_yes',
         'Yes Button Text',
         'perseo_feedback_settings_field_yes_cb',
@@ -276,6 +305,14 @@ function perseo_feedback_settings_init() {
         'perseo_settings_field_no',
         'No Button Text',
         'perseo_feedback_settings_field_no_cb',
+        'perseo',
+        'perseo_settings_section'
+    );
+
+    add_settings_field(
+        'perseo_settings_field_thank_you_text',
+        'Thank You Text',
+        'perseo_feedback_settings_field_thank_you_text_cb',
         'perseo',
         'perseo_settings_section'
     );
@@ -299,6 +336,12 @@ function perseo_feedback_settings_field_text_cb() {
     <?php
 }
 
+function perseo_feedback_settings_field_followup_text_cb() {
+    $options = get_option('perseo_options');
+    ?>
+    <textarea id="perseo_settings_field_followup_text" name="perseo_options[followup_text]" rows="4" cols="50"><?php echo esc_textarea($options['followup_text']); ?></textarea>
+    <?php
+}
 
 function perseo_feedback_settings_field_yes_cb() {
     $options = get_option('perseo_options');
@@ -311,6 +354,13 @@ function perseo_feedback_settings_field_no_cb() {
     $options = get_option('perseo_options');
     ?>
     <input type="text" id="perseo_settings_field_no" name="perseo_options[no]" value="<?php echo esc_attr($options['no']); ?>" />
+    <?php
+}
+
+function perseo_feedback_settings_field_thank_you_text_cb() {
+    $options = get_option('perseo_options');
+    ?>
+    <textarea id="perseo_settings_field_thank_you_text" name="perseo_options[thank_you_text]" rows="4" cols="50"><?php echo esc_textarea($options['thank_you_text']); ?></textarea>
     <?php
 }
 
@@ -334,6 +384,9 @@ function perseo_feedback_statistics_page() {
     // Get desktop and mobile counts
     $desktop_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE device = 'desktop'");
     $mobile_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE device = 'mobile'");
+
+    // Get latest 5 feedbacks
+    $latest_feedbacks = $wpdb->get_results("SELECT * FROM $table_name ORDER BY time DESC LIMIT 5");
 
 
 
@@ -412,6 +465,29 @@ function perseo_feedback_statistics_page() {
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div id="latest-feedbacks">
+            <h2>Latest 5 Feedbacks</h2>
+            <table class="responsive-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>URL</th>
+                        <th>Feedback</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($latest_feedbacks as $feedback) : ?>
+                        <tr>
+                            <td><?php echo esc_html($feedback->time); ?></td>
+                            <td><?php echo esc_html($feedback->url); ?></td>
+                            <td><?php echo esc_html($feedback->feedback); ?></td>
+                            <td><?php echo esc_html($feedback->comment); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
 
         <script type="text/javascript">
