@@ -2,7 +2,6 @@
 
 ![MIT License](https://img.shields.io/badge/license-MIT-green)
 ![Plugin Version](https://img.shields.io/badge/version-1.1-blue)
-![Privacy](https://img.shields.io/badge/privacy-respected-brightgreen)
 ![Stars](https://img.shields.io/github/stars/giovannimanetti11/perseo-feedback-system?style=social)
 
 
