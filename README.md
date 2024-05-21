@@ -27,7 +27,7 @@ Statistics are displayed in the related plugin's menu within WordPress.
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. If you have suggestions for how we could improve, or want to contribute to the development, please fork the repository and create a pull request.
 
-## Support Us
+## Support my work
 
 If you like this plugin and find it useful, consider supporting me by making a donation. Your donation will help me to maintain and improve this plugin.
 
