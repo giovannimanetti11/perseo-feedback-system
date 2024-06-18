@@ -3,7 +3,7 @@
 Plugin Name: Perseo Feedback System
 Plugin URI: https://github.com/giovannimanetti11/perseo-feedback-system
 Description: An open-source feedback system for your WordPress site.
-Version: 1.1
+Version: 1.1.1
 Author: Giovanni Manetti
 Author URI: https://github.com/giovannimanetti11
 License: MIT License
@@ -27,10 +27,7 @@ function perseo_feedback_html() {
     echo '<div id="perseo-feedback-close"><i class="fa fa-times-circle" aria-hidden="true"></i></div>';
     echo '</div>';
 }
-
-
 add_action('wp_footer', 'perseo_feedback_html');
-
 
 // Register REST API route
 function perseo_register_rest_route() {
@@ -42,7 +39,6 @@ function perseo_register_rest_route() {
 }
 add_action('rest_api_init', 'perseo_register_rest_route');
 
-
 // Register scripts and styles
 function perseo_enqueue_scripts() {
     wp_enqueue_script('wp-api-fetch');
@@ -50,12 +46,12 @@ function perseo_enqueue_scripts() {
     wp_enqueue_style('perseo-feedback-style', plugin_dir_url(__FILE__) . 'style.css', array(), '0.1');
 
     $options = get_option('perseo_options');
-    
+
     // Localize the script with new data
     $script_data_array = array(
         'nonce' => wp_create_nonce('wp_rest'),  // Nonce for REST API
-        'followupText' => $options['followup_text'],
-        'thankYouText' => $options['thank_you_text']
+        'followupText' => esc_html($options['followup_text']),
+        'thankYouText' => esc_html($options['thank_you_text'])
     );
     wp_localize_script('perseo-feedback-script', 'perseoSettings', $script_data_array);
 }
@@ -64,10 +60,7 @@ add_action('wp_enqueue_scripts', 'perseo_enqueue_scripts');
 function perseo_enqueue_admin_scripts() {
     wp_enqueue_style('perseo-feedback-style', plugin_dir_url(__FILE__) . 'style.css', array(), '0.1');
 }
-
 add_action('admin_enqueue_scripts', 'perseo_enqueue_admin_scripts');
-
-
 
 // On plugin activation, create feedback table
 register_activation_hook(__FILE__, 'perseo_feedback_install');
@@ -76,10 +69,9 @@ function perseo_feedback_install() {
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'perseo_feedback';
-
     $charset_collate = $wpdb->get_charset_collate();
 
-    // Create the feedback table
+    // Create feedback table
     $sql = "CREATE TABLE $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
@@ -93,8 +85,6 @@ function perseo_feedback_install() {
     ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-    // Execute the SQL query to create the table
     dbDelta($sql);
 }
 
@@ -108,27 +98,24 @@ function perseo_getallheaders() {
     return $headers;
 }
 
-
 function perseo_save_feedback() {
     error_log('perseo_save_feedback was called');
 
-    // Get the nonce from the headers
+    // Get nonce from the headers
     $headers = perseo_getallheaders();
     if (!isset($headers['X-Wp-Nonce'])) {
         wp_send_json_error('Nonce not provided', 403);
         exit;
     }
 
-    // Verify the nonce
+    // Verify nonce
     $nonce = $headers['X-Wp-Nonce'];
-
     if (!wp_verify_nonce($nonce, 'wp_rest')) {
         wp_send_json_error('Invalid nonce', 403);
         exit;
     }
 
     global $wpdb;
-
     error_log(print_r($_POST, true));
 
     // Get the raw POST data
@@ -137,7 +124,7 @@ function perseo_save_feedback() {
     // Decode the JSON data into an array
     $data = json_decode($raw_data, true);
 
-    // Validate the data
+    // Validate data
     if (!isset($data['url']) || !isset($data['feedback'])) {
         wp_send_json_error('Missing data', 400);
         exit;
@@ -148,17 +135,15 @@ function perseo_save_feedback() {
         exit;
     }
 
-    // Sanitize the data
+    // Sanitize data
     $url = sanitize_text_field($data['url']);
     $feedback = sanitize_text_field($data['feedback']);
-    $ip = $_SERVER['REMOTE_ADDR'];
-    $device = wp_is_mobile() ? 'mobile' : 'desktop';
-    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    $ip = sanitize_text_field($_SERVER['REMOTE_ADDR']);
+    $device = sanitize_text_field(wp_is_mobile() ? 'mobile' : 'desktop');
+    $user_agent = sanitize_text_field($_SERVER['HTTP_USER_AGENT']);
+    $comment = isset($data['comment']) ? sanitize_textarea_field($data['comment']) : '';
 
     $table_name = $wpdb->prefix . 'perseo_feedback';
-
-    $data = json_decode($raw_data, true);
-    $comment = isset($data['comment']) ? sanitize_textarea_field($data['comment']) : '';
 
     // Insert feedback data into the database
     $result = $wpdb->insert(
@@ -175,26 +160,22 @@ function perseo_save_feedback() {
     );
 
     if ($result === false) {
-        // The insert failed. Log the error and then return an error message with the last error occurred in $wpdb.
         error_log('Failed to insert feedback into database: ' . $wpdb->last_error);
         wp_send_json_error($wpdb->last_error, 500);
     } else {
-        // If everything went well, log a success message and then send a 200 status code and a success message
         error_log('Successfully inserted feedback into database');
         wp_send_json_success("Feedback recorded successfully", 200);
     }
-
-
-    
-    
 }
 
 function perseo_validate_options($input) {
-    // All our options are text fields, so sanitize them
+    // Sanitize all the options
     $input['position'] = sanitize_text_field($input['position']);
     $input['text'] = sanitize_text_field($input['text']);
     $input['yes'] = sanitize_text_field($input['yes']);
     $input['no'] = sanitize_text_field($input['no']);
+    $input['followup_text'] = sanitize_text_field($input['followup_text']);
+    $input['thank_you_text'] = sanitize_text_field($input['thank_you_text']);
 
     // Validate position option
     if (!in_array($input['position'], ['top', 'bottom'])) {
@@ -208,15 +189,11 @@ function perseo_validate_options($input) {
 
     return $input;
 }
-
 register_setting('perseo', 'perseo_options', 'perseo_validate_options');
-
 
 // Register the AJAX action for saving feedback
 add_action('wp_ajax_perseo_save_feedback', 'perseo_save_feedback');
 add_action('wp_ajax_nopriv_perseo_save_feedback', 'perseo_save_feedback');
-
-
 
 function perseo_feedback_menu() {
     // Add the top-level admin menu
@@ -226,14 +203,14 @@ function perseo_feedback_menu() {
     $menu_slug = 'perseo-feedback-settings';
     $function = 'perseo_feedback_settings_page';
     $icon_url = 'dashicons-chart-bar';  // Use a dashicon for bar charts
-    $position = 100;  // Position in menu. Higher number is lower.
+    $position = 100;  // Position in menu
     add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
 
     // Add submenu page with same slug as parent to ensure no duplicates
     $sub_menu_title = 'Settings';
     add_submenu_page($menu_slug, $page_title, $sub_menu_title, $capability, $menu_slug, $function);
 
-    // Now add the submenu page for Statistics
+    // Add the submenu page for Statistics
     $submenu_page_title = 'Perseo Feedback Statistics (Beta)';
     $submenu_title = 'Statistics (Beta)';
     $submenu_slug = 'perseo-feedback-statistics';
@@ -258,10 +235,9 @@ function perseo_feedback_settings_page() {
     <?php
 }
 
-
 function perseo_feedback_settings_init() {
     register_setting('perseo', 'perseo_options');
-    
+
     add_settings_section(
         'perseo_settings_section',
         'Perseo Feedback Settings',
@@ -364,9 +340,6 @@ function perseo_feedback_settings_field_thank_you_text_cb() {
     <?php
 }
 
-
-
-
 function perseo_feedback_statistics_page() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'perseo_feedback';
@@ -387,8 +360,6 @@ function perseo_feedback_statistics_page() {
 
     // Get latest 5 feedbacks
     $latest_feedbacks = $wpdb->get_results("SELECT * FROM $table_name ORDER BY time DESC LIMIT 5");
-
-
 
     // Get top 5 pages with best feedback
     $top_pages = $wpdb->get_results("
@@ -422,8 +393,8 @@ function perseo_feedback_statistics_page() {
         </div>
         <div class="statistics">
             <?php
-            echo "<div><h2>Total feedbacks:</h2> " . $total_feedback_count . "</div>";
-            echo "<div><h2>Feedbacks in the last 7 days:</h2> " . $last_7_days_feedback_count . "</div>";
+            echo "<div><h2>Total feedbacks:</h2> " . esc_html($total_feedback_count) . "</div>";
+            echo "<div><h2>Feedbacks in the last 7 days:</h2> " . esc_html($last_7_days_feedback_count) . "</div>";
             ?>
         </div>
         <div id="tables">
@@ -518,13 +489,9 @@ function perseo_feedback_statistics_page() {
                 };
                 var chart2 = new google.visualization.PieChart(document.getElementById('piechart_device'));
                 chart2.draw(data2, options2);
-
             }
         </script>
     </div>
     <?php
 }
-
-
-
-
+?>

@@ -12,6 +12,7 @@
     z-index: 9999;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     transition: all 0.5s ease-in-out;
+    border-top-right-radius: 10px;
 }
 
 #perseo-feedback-widget.feedback-selected {
@@ -172,11 +173,11 @@
 @media only screen and (max-width: 600px) {
 
     #perseo-feedback-widget {
-        width: 90%;
-        left: 5%;
+        width: 100%;
         bottom: 10px;
         display: flex;
         flex-direction: column;
+        border: none;
     }
 
     #perseo-feedback-widget span {
@@ -188,6 +189,7 @@
 
     #perseo-feedback-widget .buttons-container {
         flex-direction: column;
+        width: 100%;
     }
 
     #perseo-feedback-widget button {

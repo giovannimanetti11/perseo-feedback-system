@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Document is ready');
 
     var widget = document.getElementById('perseo-feedback-widget');
     var yesButton = document.getElementById('perseo-feedback-yes');
